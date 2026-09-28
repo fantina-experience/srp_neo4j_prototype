@@ -1,0 +1,30 @@
+
+# Load Tier Locations
+if os.path.exists(f'{CSV_FOLDER}/4_tier_locations.csv'):
+    df = pd.read_csv(f'{CSV_FOLDER}/4_tier_locations.csv')
+    print(f"📦 Loading {len(df)} Location nodes...")
+    with driver.session() as session:
+        for idx, row in df.iterrows():
+            try:
+                session.run("""
+                    CREATE (l:Location {
+                        id: $location_id, tier_id: $tier_id, vertical: $vertical,
+                        city: $city, state: $state, country: $country,
+                        latitude: $latitude, longitude: $longitude,
+                        phone: $phone, email1: $email1
+                    })
+                """, parameters={
+                    'location_id': str(row.get('location_id')),
+                    'tier_id': safe_int(row.get('tier_id')),
+                    'vertical': str(row.get('vertical')) if pd.notna(row.get('vertical')) else None,
+                    'city': str(row.get('city')) if pd.notna(row.get('city')) else None,
+                    'state': str(row.get('state')) if pd.notna(row.get('state')) else None,
+                    'country': str(row.get('country')) if pd.notna(row.get('country')) else None,
+                    'latitude': str(row.get('latitude')) if pd.notna(row.get('latitude')) else None,
+                    'longitude': str(row.get('longitude')) if pd.notna(row.get('longitude')) else None,
+                    'phone': str(row.get('phone')) if pd.notna(row.get('phone')) else None,
+                    'email1': str(row.get('email1')) if pd.notna(row.get('email1')) else None,
+                })
+            except:
+                pass
+    print(f"✓ Loaded Locations\n")

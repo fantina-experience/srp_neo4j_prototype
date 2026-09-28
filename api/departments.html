@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRP ETL - Department Views</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .nav-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .dept-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .dept-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .dept-btn.active {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+        }
+
+        .sales-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .marketing-btn {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .operations-btn {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .back-link {
+            color: white;
+            text-decoration: none;
+            margin-bottom: 20px;
+            display: inline-block;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+        }
+
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .dept-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .dept-title {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .dept-desc {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 1.05em;
+        }
+
+        .queries-section {
+            margin-top: 30px;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .query-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .query-name {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .query-purpose {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+
+        .data-points {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .data-points strong {
+            color: #333;
+        }
+
+        .key-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .endpoints {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        .endpoint {
+            padding: 5px 0;
+            color: #667eea;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .action-btn:hover {
+            background: #5568d3;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← Back to Dashboard</a>
+
+        <div class="header">
+            <h1>🏢 Department-Specific Views</h1>
+            <p>Tailored Intelligence for Sales, Search, Marketing & Operations</p>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="dept-btn sales-btn active" onclick="showDept('sales')">💰 Sales Engine</button>
+            <button class="dept-btn search-btn" onclick="showDept('search')">🔍 Search Engine</button>
+            <button class="dept-btn marketing-btn" onclick="showDept('marketing')">📢 Marketing Engine</button>
+            <button class="dept-btn operations-btn" onclick="showDept('operations')">📊 Operations</button>
+        </div>
+
+        <!-- SALES ENGINE -->
+        <div id="sales" class="content active">
+            <div class="dept-card">
+                <h2 class="dept-title">💰 Sales Engine (CPQ & Contract Lifecycle)</h2>
+                <p class="dept-desc"><strong>Quoting & Contracting:</strong> Reads professional data for guided selling, quote building, and contract terms. Powers AI-drafted narratives and redline summarization from graph data.</p>
+
+                <div class="key-metrics">
+                    <div class="metric-box">
+                        <div class="metric-label">High Confidence Agents</div>
+                        <div class="metric-value">📈 Ready to Pitch</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Rising Stars</div>
+                        <div class="metric-value">🚀 Growth Leaders</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Win Probability</div>
+                        <div class="metric-value">🎯 Success Rate</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Movement Signals</div>
+                        <div class="metric-value">⚡ Market Changes</div>
+                    </div>
+                </div>
+
+                <div class="queries-section">
+                    <h3 class="section-title">Core Queries</h3>
+
+                        <div class="query-item">
+                        <div class="query-name">Query 1: Get Professional + Full Profile</div>
+                        <div class="query-purpose">Complete context for quote builder - professional details, specialties, ratings</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> Name, email, phone, experience, verticals, confidence scores, reviews, trust level, ratings
+                        </div>
+                    </div>
+
+                    <div class="query-item">
+                        <div class="query-name">Query 2: Professionals by Vertical & Location</div>
+                        <div class="query-purpose">Find qualified professionals for targeted quoting</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> Vertical specialists, location-based professionals, confidence score, win probability
+                        </div>
+                    </div>
+
+                    <div class="query-item">
+                        <div class="query-name">Query 3: Cross-Vertical Specialists</div>
+                        <div class="query-purpose">Identify multi-specialty professionals for bundle quotes</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> Vertical count, specialization list, experience, influencer status
+                        </div>
+                    </div>
+
+                    <div class="query-item">
+                        <div class="query-name">Query 4: Professional Network Intelligence</div>
+                        <div class="query-purpose">Track movement and changes for contract updates</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> Movement signals, profile changes, new verticals, trend indicators
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoints">
+                    <strong>API Endpoints:</strong><br>
+                    <div class="endpoint">GET /api/credibility-leaders</div>
+                    <div class="endpoint">GET /api/rising-stars</div>
+                    <div class="endpoint">GET /api/movement-intelligence</div>
+                    <div class="endpoint">GET /api/vertical-intelligence</div>
+                    <div class="endpoint">GET /api/wow-top-performers</div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="alert('Sales reports feature coming soon!')">📊 Generate Report</button>
+                    <button class="action-btn" onclick="alert('Export CSV feature coming soon!')">💾 Export Data</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEARCH ENGINE -->
+        <div id="search" class="content">
+            <div class="dept-card">
+                <h2 class="dept-title">🔍 Search Engine (Online Search & Ranking)</h2>
+                <p class="dept-desc"><strong>Query, Rank, Explain:</strong> Consumes ranking scores from graph. Renders results, provides rank explainability showing why a professional ranks where they do, and what moves them up.</p>
+
+                <div class="key-metrics">
+                    <div class="metric-box">
+                        <div class="metric-label">Market Concentration</div>
+                        <div class="metric-value">🔥 Hot Markets</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Vertical Leaders</div>
+                        <div class="metric-value">👑 Top Experts</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Credibility Score</div>
+                        <div class="metric-value">⭐ Quality Rating</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Peer Networks</div>
+                        <div class="metric-value">🤝 Relationships</div>
+                    </div>
+                </div>
+
+                <div class="queries-section">
+                    <h3 class="section-title">Core Queries</h3>
+
+                    <div class="query-item">
+                        <div class="query-name">Query 4: Get Agents by Vertical</div>
+                        <div class="query-purpose">Find all agents in a specific vertical</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> Agent list, confidence, location, experience, scores
+                        </div>
+                    </div>
+
+                    <div class="query-item">
+                        <div class="query-name">Query 5: Get Agents by Location</div>
+                        <div class="query-purpose">Discover agents operating in specific cities/states</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> Location details, vertical, confidence, reviews
+                        </div>
+                    </div>
+
+                    <div class="query-item">
+                        <div class="query-name">Query 6: Top Agents by Score</div>
+                        <div class="query-purpose">Rank agents by credibility and influence</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> Confidence score, credibility, search rank, market value
+                        </div>
+                    </div>
+
+                    <div class="query-item">
+                        <div class="query-name">Dashboard Query: Location Concentration</div>
+                        <div class="query-purpose">Identify market concentration by city and vertical</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> City, vertical, agent count, sample agents
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoints">
+                    <strong>API Endpoints:</strong><br>
+                    <div class="endpoint">GET /api/location-concentration</div>
+                    <div class="endpoint">GET /api/vertical-intelligence</div>
+                    <div class="endpoint">GET /api/credibility-leaders</div>
+                    <div class="endpoint">GET /api/wow-market-concentration</div>
+                    <div class="endpoint">GET /api/wow-quality-network</div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="alert('Search filters coming soon!')">🔎 Advanced Search</button>
+                    <button class="action-btn" onclick="alert('Saved searches coming soon!')">💾 Save Search</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MARKETING ENGINE -->
+        <div id="marketing" class="content">
+            <div class="dept-card">
+                <h2 class="dept-title">📢 Marketing Engine (Content & Targeting)</h2>
+                <p class="dept-desc"><strong>Asset Publishing & Graph-Driven Targeting:</strong> Reads graph to personalize landing pages by location/vertical. Assembles graph-driven content blocks and tracks attribution back to professional movement.</p>
+
+                <div class="key-metrics">
+                    <div class="metric-box">
+                        <div class="metric-label">Growth Opportunities</div>
+                        <div class="metric-value">📈 Emerging Markets</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Rising Stars</div>
+                        <div class="metric-value">🌟 New Talent</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Review Sentiment</div>
+                        <div class="metric-value">⭐ High Rated</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Market Segments</div>
+                        <div class="metric-value">🎯 Target Groups</div>
+                    </div>
+                </div>
+
+                <div class="queries-section">
+                    <h3 class="section-title">Core Queries</h3>
+
+                    <div class="query-item">
+                        <div class="query-name">Query 7: Agents by Segment</div>
+                        <div class="query-purpose">Group agents for targeted marketing campaigns</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> Segment criteria, agent count, characteristics, demographics
+                        </div>
+                    </div>
+
+                    <div class="query-item">
+                        <div class="query-name">Query 8: Growth Potential Agents</div>
+                        <div class="query-purpose">Identify emerging talent for marketing focus</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> Trend, win probability, movement flag, years experience
+                        </div>
+                    </div>
+
+                    <div class="query-item">
+                        <div class="query-name">Query 9: Agent Reputation Scores</div>
+                        <div class="query-purpose">Track agent quality perception and reviews</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> Avg rating, review count, trust level, rating category
+                        </div>
+                    </div>
+
+                    <div class="query-item">
+                        <div class="query-name">Dashboard Query: Review Sentiment</div>
+                        <div class="query-purpose">High-rated agents by location for testimonials</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> Avg rating, review count, trust level, location
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoints">
+                    <strong>API Endpoints:</strong><br>
+                    <div class="endpoint">GET /api/review-sentiment</div>
+                    <div class="endpoint">GET /api/rising-stars</div>
+                    <div class="endpoint">GET /api/tier-hierarchy</div>
+                    <div class="endpoint">GET /api/wow-growth-opportunities</div>
+                    <div class="endpoint">GET /api/wow-top-performers</div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="alert('Campaign builder coming soon!')">📧 Create Campaign</button>
+                    <button class="action-btn" onclick="alert('Segment analytics coming soon!')">📊 View Segments</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- OPERATIONS / ANALYTICS -->
+        <div id="operations" class="content">
+            <div class="dept-card">
+                <h2 class="dept-title">📊 Operations (Monitoring & Release Mgmt)</h2>
+                <p class="dept-desc"><strong>Platform Health & Release Control:</strong> Monitors graph data freshness, ETL pipeline state, and data quality. Tracks what deployed when across all 13 disciplines. Provides rollback capabilities for live graph updates.</p>
+
+                <div class="key-metrics">
+                    <div class="metric-box">
+                        <div class="metric-label">Total Agents</div>
+                        <div class="metric-value">100 Profiles</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Data Coverage</div>
+                        <div class="metric-value">98% Complete</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Graph Relationships</div>
+                        <div class="metric-value">658 Edges</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-label">Data Freshness</div>
+                        <div class="metric-value">Real-Time Sync</div>
+                    </div>
+                </div>
+
+                <div class="queries-section">
+                    <h3 class="section-title">Core Queries</h3>
+
+                    <div class="query-item">
+                        <div class="query-name">Query 10: Overall Platform Metrics</div>
+                        <div class="query-purpose">Monitor system health and statistics</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> Total agents, confidence distribution, trend categories, review stats
+                        </div>
+                    </div>
+
+                    <div class="query-item">
+                        <div class="query-name">Query 11: Data Quality Audit</div>
+                        <div class="query-purpose">Check data completeness and integrity</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> Missing values, incomplete records, anomalies, coverage %
+                        </div>
+                    </div>
+
+                    <div class="query-item">
+                        <div class="query-name">Query 12: Relationship Analytics</div>
+                        <div class="query-purpose">Analyze graph structure and connections</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> Edge types, relationship counts, network density, clustering
+                        </div>
+                    </div>
+
+                    <div class="query-item">
+                        <div class="query-name">Dashboard Queries: Tier Hierarchy + Metrics</div>
+                        <div class="query-purpose">Organizational structure and aggregate statistics</div>
+                        <div class="data-points">
+                            <strong>Data Returned:</strong> Tier breakdown, agent distribution, confidence by tier
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoints">
+                    <strong>API Endpoints:</strong><br>
+                    <div class="endpoint">GET /api/metrics</div>
+                    <div class="endpoint">GET /api/health</div>
+                    <div class="endpoint">GET /api/tier-hierarchy</div>
+                    <div class="endpoint">GET /api/relationship-discovery</div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="alert('System monitoring coming soon!')">📡 System Monitor</button>
+                    <button class="action-btn" onclick="alert('Data quality reports coming soon!')">✅ Quality Report</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🎯 Each department has curated queries and metrics for their specific needs</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">For questions, check the QUERY_CATALOG.md</p>
+        </div>
+    </div>
+
+    <script>
+        function showDept(dept) {
+            // Hide all content
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+
+            // Remove active from all buttons
+            document.querySelectorAll('.dept-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Show selected content
+            document.getElementById(dept).classList.add('active');
+
+            // Add active to clicked button
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
